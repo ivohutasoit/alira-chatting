@@ -1,4 +1,4 @@
-module github.com/heroku/go-getting-started
+module github.com/ivohutasoit/alira-chatting
 
 go 1.12
 

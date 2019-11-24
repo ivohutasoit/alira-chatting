@@ -1,12 +1,12 @@
 {
-  "name": "Start on Heroku: Go",
-  "description": "Go Getting Started Example App",
+  "name": "Alira Chatting",
+  "description": "Alira Chatting module",
   "keywords": [
-    "getting-started",
+    "alira-chatting",
     "go",
     "sample",
     "example"
   ],
-  "website": "http://github.com/heroku/go-getting-started",
-  "repository": "http://github.com/heroku/go-getting-started"
+  "website": "http://github.com/ivohutasoit/alira-chatting",
+  "repository": "http://github.com/ivohutasoit/alira-chatting"
 }
