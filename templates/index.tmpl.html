@@ -44,7 +44,7 @@
             </div>
             <div class="row" v-if="joined">
                 <div class="input-field col s8">
-                    <input type="text" v-model="newMsg" @keyup.enter="send">
+                    <input type="text" v-model="newMsg" @keyup.enter="send()">
                 </div>
                 <div class="input-field col s4">
                     <button class="waves-effect waves-light btn" @click="send()">
@@ -76,7 +76,7 @@
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
-    <script>
+    <script defer>
         new Vue({
             el: '#app',
             data: {
