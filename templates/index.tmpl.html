@@ -1,60 +1,136 @@
-<html>
-  {{template "header.tmpl.html"}}
-<body>
-  {{template "nav.tmpl.html"}}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Alira Chat</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.6/assets/css/emojione.min.css"/>
+        <style>
+            body {
+                display: flex;
+                min-height: 100vh;
+                flex-direction: column;
+            }
 
-<div class="jumbotron text-center">
-  <div class="container">
-    <a href="/" class="lang-logo">
-      <img src="/static/lang-logo.png">
-    </a>
-    <h1>Getting Started with Go on Heroku</h1>
-      <p>This is a sample Go application deployed to Heroku. It's a reasonably simple app - but a good foundation for understanding how to get the most out of the Heroku platform.</p>
-      <a type="button" class="btn btn-lg btn-default" href="https://devcenter.heroku.com/articles/getting-started-with-go"><span class="glyphiconglyphicon-flash"></span> Getting Started with Go</a>
-      <a type="button" class="btn btn-lg btn-primary" href="https://github.com/heroku/go-getting-started"><span class="glyphiconglyphicon-download"></span> Source on GitHub</a>
-  </div>
-</div>
-<div class="container">
-  <div class="alert alert-info text-center" role="alert">
-      To deploy your own copy, and learn the fundamentals of the Heroku platform, head over to the <a href="https://devcenter.heroku.com/articles/getting-started-with-go" class="alert-link">Getting Started with Go on Heroku</a> tutorial.
-  </div>
-  <hr>
-  <div class="row">
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>
-      <ul>
-          <li>This app was deployed to Heroku, either using Git or by using <a href="https://github.com/heroku/go-getting-started">Heroku Button</a> on the repository.</li>
+            main {
+                flex: 1 0 auto;
+            }
 
-          <li>When Heroku received the source code it used the go tool chain to compile the application along with any vendored dependencies and created a deployable slug.</li>
-          <li>The platform then spins up a dyno, a lightweight container that provides an isolated environment in which the slug can be mounted and executed.</li>
-          <li>You can scale your app, manage it, and deploy over <a href="https://addons.heroku.com/">150 add-on services</a>, from the Dashboard or CLI.</li>
-      </ul>
-    </div>
-    <div class="col-md-6">
-      <h3><span class="glyphicon glyphicon-link"></span> Next Steps</h3>
-      <ul>
-        <li>If you are following the <a href="https://devcenter.heroku.com/articles/getting-started-with-go">Getting Started</a> guide, then please head back to the tutorial and follow the next steps!</li>
-        <li>If you deployed this app by deploying the Heroku Button, then in a command line shell, run:</li>
-        <ul>
-          <li><code>go get github.com/heroku/go-getting-started</code> - this will create a local copy of the source code for the app, compile and install the generated executables in <code>$GOPATH/bin</code></li>
-          <li><code>cd $GOPATH/src/github.com/heroku/go-getting-started</code> - change directory into the local source code repository</li>
-          <li><code>heroku git:remote -a &lt;your-app-name&gt;</code> - associate the Heroku app with the repository</li>
-          <li>You'll now be set up to run the app locally, or <a href="https://devcenter.heroku.com/articles/getting-started-with-go#push-local-changes">deploy changes</a> to Heroku</li>
-        </ul>
-      </ul>
-      <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
-      <ul>
-        <li><a href="https://www.heroku.com/home">Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/">Heroku Dev Center</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/getting-started-with-go">Getting Started with Go on Heroku</a></li>
-        <li><a href="https://devcenter.heroku.com/articles/go-support">Heroku Go Support</a></li>
-      </ul>
-    </div>
-  </div> <!-- row -->
-    <div class="alert alert-info text-center" role="alert">
-      Please do work through the Getting Started guide, even if you do know how to build such an application. The guide covers the basics of working with Heroku, and will familiarize you with all the concepts you need in order to build and deploy your own apps.
-  </div>
-</div>
-
-</body>
+            #chat-messages {
+                min-height: 10vh;
+                height: 60vh;
+                width: 100%;
+                overflow-y: scroll;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <div class="nav-wrapper">
+                    <a href="/" class="brand-logo right">Alira Chat</a>
+                </div>
+            </nav>
+        </header>
+        <main id="app">
+            <div class="row">
+                <div class="col s12">
+                    <div class="card horizontal">
+                        <div id="chat-messages" class="card-content" v-html="chatContent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" v-if="joined">
+                <div class="input-field col s8">
+                    <input type="text" v-model="newMsg" @keyup.enter="send">
+                </div>
+                <div class="input-field col s4">
+                    <button class="waves-effect waves-light btn" @click="send">
+                        <i class="material-icons right">chat</i>
+                        Send
+                    </button>
+                </div>
+            </div>
+            <div class="row" v-if="!joined">
+                <div class="input-field col s8">
+                    <input type="email" v-model.trim="email" placeholder="Email">
+                </div>
+                <div class="input-field col s8">
+                    <input type="text" v-model.trim="username" placeholder="Username">
+                </div>
+                <div class="input-field col s4">
+                    <button class="waves-effect waves-light btn" @click="join()">
+                        <i class="material-icons right">done</i>
+                        Join
+                    </button>
+                </div>
+            </div>
+        </main>
+        <footer class="page-footer">
+        </footer>
+    </body>
+    <script src="https://unpkg.com/vue@2.1.3/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/emojione/2.2.6/lib/js/emojione.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                ws: null,
+                newMsg: '',
+                chatContent: '',
+                email: null,
+                username: null,
+                joined: false
+            },
+            created: function() {
+                var self = this;
+                this.ws = new WebSocket('ws://' + window.location.host + '/ws');
+                this.ws.addEventListener('message', function(e) {
+                    var msg = JSON.parse(e.data);
+                    self.chatContent += '<div class="chip">'
+                        + '<img src="' + self.gravatarURL(msg.email) + '">'
+                        + msg.username
+                        + '</div>'
+                        + emojione.toImage(msg.text) + '<br/>';
+                    var element = document.getElementById('chat-messages');
+                    elemet.scrollTop = element.scrollHeight;
+                });
+            },
+            methods: {
+                send: function () {
+                    if (this.newMsg != '') {
+                        this.ws.send(
+                            JSON.stringify({
+                                email: this.email,
+                                username: this.username,
+                                text: $('<p>').html(this.newMsg).text() // Strip out html
+                            }
+                        ));
+                        this.newMsg = ''; // Reset newMsg
+                    }
+                },
+                join: function () {
+                    if (!this.email) {
+                        Materialize.toast('You must enter an email', 2000);
+                        return
+                    }
+                    if (!this.username) {
+                        Materialize.toast('You must choose a username', 2000);
+                        return
+                    }
+                    this.email = $('<p>').html(this.email).text();
+                    this.username = $('<p>').html(this.username).text();
+                    this.joined = true;
+                },
+                gravatarURL: function(email) {
+                    return 'http://www.gravatar.com/avatar/' + CryptoJS.MD5(email);
+                }
+            }
+        })
+    </script>
 </html>

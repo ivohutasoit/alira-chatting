@@ -44,3 +44,4 @@ or
 For more information about using Go on Heroku, see these Dev Center articles:
 
 - [Go on Heroku](https://devcenter.heroku.com/categories/go)
+- [A chat demo, written in Golang](https://github.com/manhtai/golang-mongodb-chat)

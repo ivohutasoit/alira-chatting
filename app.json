@@ -2,10 +2,7 @@
   "name": "Alira Chatting",
   "description": "Alira Chatting module",
   "keywords": [
-    "alira-chatting",
-    "go",
-    "sample",
-    "example"
+    "alira-chatting"
   ],
   "website": "http://github.com/ivohutasoit/alira-chatting",
   "repository": "http://github.com/ivohutasoit/alira-chatting"
