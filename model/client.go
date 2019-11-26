@@ -1,6 +1,9 @@
 package model
 
 import (
+	"log"
+	"time"
+
 	"github.com/gorilla/websocket"
 	"github.com/ivohutasoit/alira/model/domain"
 )
@@ -13,13 +16,13 @@ type Client struct {
 	Send    chan *domain.Chat
 	Room    Room
 	User    domain.User
-	Saved	SavedChat
+	Saved   SavedChat
 }
 
 func (client *Client) Read() {
 	defer client.Socket.Close()
 	for {
-		var chat *model.Chat
+		var chat *domain.Chat
 		err := client.Socket.ReadJSON(&chat)
 		if err != nil {
 			log.Print(err)
@@ -30,14 +33,14 @@ func (client *Client) Read() {
 		chat.Channel = client.Channel
 		chat.User = client.User.ID
 		chat.Timestamp = time.Now()
-		
+
 		client.Room.Forward <- chat
 
 		savedChat := &SavedChat{
-			Chat: chat
+			Chat: chat,
 		}
 
-		*client.Saved <- savedChat
+		*client.Saved <- *savedChat
 	}
 }
 
