@@ -1,11 +1,13 @@
 package service
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/gorilla/websocket"
 	"github.com/ivohutasoit/alira-chatting/model"
 	"github.com/ivohutasoit/alira/model/domain"
-	"log"
-	"net/http"
+	"github.com/ivohutasoit/alira/util"
 )
 
 func Run(room *model.Room) {
@@ -55,11 +57,23 @@ func StartChatRoom(room *model.Room, savedChat *chan model.SavedChat) http.Handl
 			return
 		}
 
+		// Get user out of session
+		session, _ := util.Session.Get(req, "session")
+		val := session.Values["user"]
+		var user = &domain.User{}
+		var ok bool
+
+		if user, ok = val.(*domain.User); !ok {
+			log.Print("Invalid session")
+			return
+		}
+
 		client := &model.Client{
 			Socket:  socket,
 			Send:    make(chan *domain.Chat, messageBufferSize),
 			Room:    room,
 			Channel: id,
+			User:    user,
 			Saved:   savedChat,
 		}
 
