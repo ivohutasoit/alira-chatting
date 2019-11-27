@@ -24,7 +24,13 @@ func main() {
 	router.Static("/static", "static")
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl.html", nil)
+		c.HTML(http.StatusOK, "index.tmpl.html", gin.H{
+			"token": service.GenerateToken(),
+		})
+		//http.ServeFile(c.Writer, c.Request, "templates/home.tmpl.html")
+	})
+	router.GET("/api/alpha/qrcode", func(c *gin.Context) {
+		service.GenerateQRCode(c.Writer, c.Request)
 	})
 
 	room := service.CreateChatRoom()
