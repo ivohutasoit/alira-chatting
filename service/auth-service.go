@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"time"
+
+	"github.com/ivohutasoit/alira/util"
 
 	"github.com/gin-gonic/gin"
 
@@ -17,20 +20,28 @@ type SocketLogin struct {
 }
 
 const (
-	letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	letters   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	secretKey = "time2SleepW3LLOK"
 )
 
 var tokens = make(map[string]SocketLogin)
 
 func GenerateToken() (token string) {
 	b := make([]byte, 16)
+	rand.Seed(time.Now().UnixNano())
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
+
+	encrypted, err := util.Encrypt([]byte(secretKey), b)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	}
+	log.Println(string(b))
 	tokens[string(b)] = SocketLogin{
 		Status: 1,
 	}
-	return string(b)
+	return encrypted
 }
 
 func GenerateQRCode(c *gin.Context) {
@@ -49,21 +60,26 @@ func GenerateQRCode(c *gin.Context) {
 
 func ActivateSocket(c *gin.Context) {
 	token := c.Param("token")
+	log.Println(token)
+	decrypted, err := util.Decrypt([]byte(secretKey), []byte(token))
+	if err != nil {
+		log.Printf("Error: %s", err.Error())
+	}
 	socket, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Printf("Error while upgrading socket %v", err.Error())
 		return
 	}
 
-	if tokens[token].Status != 1 {
+	if tokens[decrypted].Status != 1 {
 		defer socket.Close()
 		err := socket.WriteMessage(websocket.TextMessage, []byte("Token is not active"))
 		if err != nil {
 			return
 		}
 	}
-
-	tokens[token] = SocketLogin{
+	log.Println(decrypted)
+	tokens[decrypted] = SocketLogin{
 		Socket: socket,
 	}
 	for {
