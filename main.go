@@ -29,9 +29,9 @@ func main() {
 		})
 		//http.ServeFile(c.Writer, c.Request, "templates/home.tmpl.html")
 	})
-	router.GET("/api/alpha/qrcode", func(c *gin.Context) {
-		service.GenerateQRCode(c.Writer, c.Request)
-	})
+	router.GET("/api/alpha/qrcode/generate/:token", service.GenerateQRCode)
+	router.GET("/api/alpha/auth/socket/:token", service.ActivateSocket)
+	router.GET("/api/alpha/auth/token/:token", service.ValidateToken)
 
 	room := service.CreateChatRoom()
 	chat := service.CreateSavedChat()
