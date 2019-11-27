@@ -16,7 +16,7 @@ type Client struct {
 	Send    chan *domain.Chat
 	Room    Room
 	User    domain.User
-	Saved   SavedChat
+	Saved   *chan SavedChat
 }
 
 func (client *Client) Read() {
