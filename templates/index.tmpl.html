@@ -7,12 +7,28 @@
 	</head>
 	<body>
 		<div style="text-align: center">
-				<h1>Use your phone to scan this code</h1>
-				<img src="/api/alpha/qrcode?token={{.token}}" alt="{{.token}}">
-				<h2 style="color: green" id="message"><h2>
+			<h1>Use your phone to scan this code</h1>
+			<img src="/api/alpha/qrcode/generate/{{.token}}" alt="{{.token}}">
+			<h2 style="color: green" id="message"><h2>
 		</div>
 		<script type="text/javascript">
-			
+			var socket = null;
+            var uri = 'ws://' + window.location.host + '/api/alpha/auth/socket/{{.token}}'
+
+            window.onload = function() {
+                console.log('window onload');
+                socket = new WebSocket(uri);
+                socket.onopen = function() {
+                    console.log('Open socket connection ' + uri);
+                }
+                socket.onclose = function(e) {
+                    console.log('Close socket connection (' + e.code + ')' );
+                }
+                socket.onmessage = function(e) {
+                    console.log('Receive message: ' + e.data);
+                    document.getElementById('message').innerHTML = e.data;
+                }
+            }
 		</script>
 	</body>
 </html>
