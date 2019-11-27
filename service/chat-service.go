@@ -6,7 +6,7 @@ import (
 	"github.com/ivohutasoit/alira-chatting/model"
 )
 
-func NewSavedChat() *chan model.SavedChat {
+func CreateSavedChat() *chan model.SavedChat {
 	chat := make(chan model.SavedChat, 256)
 	go SaveChat(&chat)
 	return &chat

@@ -26,7 +26,7 @@ func Run(room *model.Room) {
 	}
 }
 
-func NewRoom() *model.Room {
+func CreateChatRoom() *model.Room {
 	room := &model.Room{
 		Forward: make(chan *domain.Chat),
 		Join:    make(chan *model.Client),
@@ -58,7 +58,7 @@ func StartChatRoom(room *model.Room, savedChat *chan model.SavedChat) http.Handl
 		}
 
 		// Get user out of session
-		session, _ := util.Session.Get(req, "session")
+		session, _ := util.Store.Get(req, "session")
 		val := session.Values["user"]
 		var user = &domain.User{}
 		var ok bool
@@ -71,9 +71,9 @@ func StartChatRoom(room *model.Room, savedChat *chan model.SavedChat) http.Handl
 		client := &model.Client{
 			Socket:  socket,
 			Send:    make(chan *domain.Chat, messageBufferSize),
-			Room:    room,
+			Room:    *room,
 			Channel: id,
-			User:    user,
+			User:    *user,
 			Saved:   savedChat,
 		}
 
