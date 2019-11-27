@@ -38,7 +38,7 @@ func GenerateQRCode(c *gin.Context) {
 	token := c.Param("token")
 
 	c.Writer.Header().Set("Content-Type", "image/png")
-	png, err := qrcode.Encode("http://localhost:9000/api/alpha/auth/token/"+token, qrcode.Medium, 256)
+	png, err := qrcode.Encode(token, qrcode.Medium, 256)
 	if err != nil {
 		fmt.Printf("Error: %s", err.Error())
 	} else {
