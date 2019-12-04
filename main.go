@@ -10,11 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/ivohutasoit/alira-chatting/service"
-	"github.com/ivohutasoit/alira/common"
 	"github.com/ivohutasoit/alira/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("error loading .env file")
+	}
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -25,9 +30,9 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	store := cookie.NewStore([]byte(common.SecretKey))
+	store := cookie.NewStore([]byte(os.Getenv("SECRET_KEY")))
 	router.Use(sessions.Sessions("ALIRASESSION", store))
-	router.Use(middleware.AuthenticationRequired("http://localhost:9000/login"))
+	router.Use(middleware.AuthenticationRequired(os.Getenv("LOGIN_URL")))
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 	router.Static("/static", "static")
 
